@@ -9,6 +9,6 @@ To Do List:
 - [ ] Backend Auth --> Clerk JWTs
 - [ ] Middleware to authorize and protect Users
 
-- [ ] API Registration Flow
+- [ ] API Registration Flow --> modals
 - [ ] Dashboard design
 - [ ] API Settings

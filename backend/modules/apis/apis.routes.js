@@ -6,8 +6,18 @@ const ApiController = require('./apis.controller')
 
 // routes & methods
 
-// webhook endpoint for clerk
-router.post("/test", ApiController.TestAPI)
+
+// CRUD for API
+// Register API
+
+// Delete API
+
+// Update Token
+
+// Update API Information
+
+// Fetch Analytics DATA --> QuestDB and NeonDB
+
 
 module.exports = router;
 
