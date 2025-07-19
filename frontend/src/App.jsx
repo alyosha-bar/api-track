@@ -1,7 +1,10 @@
-import { SignedIn, SignedOut, SignInButton, UserButton } from '@clerk/clerk-react';
 import { Route, Routes } from 'react-router-dom';
 import Landing from './pages/Landing';
 import Navbar from './components/Navbar';
+import { RedirectToSignIn, SignedIn, SignedOut } from '@clerk/clerk-react';
+import RequireAuth from './components/auth/RedirectToLanding';
+import Home from './pages/Home';
+import Dashboard from './pages/Dashboard';
 
 export default function App() {
   return (
@@ -14,7 +17,22 @@ export default function App() {
         <Route path="/" element={<Landing/>}></Route>
 
         {/* protected  */}
-        <Route path='/home' element={<> Home Page </>}></Route>
+        <Route path='/home' element={
+          <>
+            <RequireAuth>
+              <Home/>
+            </RequireAuth>
+          </>
+        }></Route>
+
+        {/* protected  */}
+        <Route path='/dashboard/:id' element={
+          <>
+            <RequireAuth>
+              <Dashboard />
+            </RequireAuth>
+          </>
+        }></Route>
 
 
         {/* catch all */}
