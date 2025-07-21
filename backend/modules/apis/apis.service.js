@@ -1,4 +1,17 @@
 const questPool = require('../../database/questdb')
+const neonPool = require('../../database/db')
+
+const GetAPIs = async (userID) => {
+    try {
+        query = 'SELECT * FROM apis WHERE user_id = $1'
+
+        const result = await neonPool.query(query, [userID])
+        return result.rows
+    } catch (error) {
+        console.error('Error fetching API', error)
+        return {error: error.message}
+    }
+}
 
 const GetAnalytics = async (apiID) => {
     try {
@@ -14,5 +27,6 @@ const GetAnalytics = async (apiID) => {
 
 
 module.exports = {
-    GetAnalytics
+    GetAnalytics,
+    GetAPIs
 }

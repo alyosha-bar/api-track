@@ -7,6 +7,7 @@ import { useState } from "react";
 import { useEffect } from "react";
 import { useMemo } from "react";
 import { API_BASE } from "../api/config";
+import { useAuth } from "@clerk/clerk-react";
 
 const COLORS = ["#6366f1", "#34d399", "#facc15", "#fb923c", "#f43f5e", "#0ea5e9"];
 
@@ -23,11 +24,29 @@ const Dashboard = () => {
   const [rawData, setRawData] = useState([]);
   const [timeScale, setTimeScale] = useState("daily");
 
+  const { getToken } = useAuth();
+
   useEffect(() => {
-    fetch(`${API_BASE}/api/core/analytics/${25}`)
-      .then(res => res.json())
-      .then(setRawData)
-      .catch(console.error);
+
+    const fetchAnalytics = async () => {
+      const token = await getToken({ template: 'IDToken' });
+      try {
+        const response = await fetch(`${API_BASE}/api/core/analytics/${25}`, {
+          headers: {
+            "Authorization": `Bearer ${token}`,
+            "Content-Type": "application/json"
+          }
+        })
+
+        const data = await response.json()
+        setRawData(data)
+      } catch (error) {
+        console.error(error)
+      }
+    }
+
+    fetchAnalytics()
+    
   }, [id]);
 
   // Prepare chart data
@@ -62,7 +81,52 @@ const Dashboard = () => {
 
   return (
     <div className="p-6 space-y-6">
-        <button onClick={() => console.log(lineData)}> Line Data </button>
+        {/* Metrics Summary Section */}
+            <div className="w-full border rounded-md border-gray-300 p-4 flex justify-around divide-x divide-gray-300 bg-white">
+                {/* Total Requests */}
+                <div className="flex-1 px-4 flex flex-col justify-center">
+                    {/* {totalreq && ( */}
+                    <>
+                        <h5 className="text-green-600 text-sm">Total Requests:</h5>
+                        <h3 className="text-green-600 text-3xl p-2 self-center">
+                        1000
+                        <div className="text-green-600 text-xs">requests in ... </div>
+                        </h3>
+                    </>
+                    {/* )} */}
+                </div>
+
+                {/* Error Rate */}
+                <div className="flex-1 px-4 flex flex-col justify-center">
+                    {/* {errorRate !== null && errorRate !== undefined && !isNaN(errorRate) && ( */}
+                    <>
+                        <h5 className="text-red-600 text-sm">Error Rate:</h5>
+                        <h3 className="text-red-600 text-3xl p-2 self-center">
+                        10%
+                        <div className="text-red-600 text-xs">in ... </div>
+                        </h3>
+                    </>
+                    {/* )} */}
+                </div>
+
+                {/* Avg Latency */}
+                <div className="flex-1 px-4 flex flex-col justify-center">
+                    <h5 className="text-black text-sm">Avg Latency:</h5>
+                    <h3 className="text-black text-3xl p-2 self-center">
+                    120 ms
+                    <div className="text-xs">per request in ... </div>
+                    </h3>
+                </div>
+                
+                {/* Avg Latency */}
+                <div className="flex-1 px-4 flex flex-col justify-center">
+                    <h5 className="text-black text-sm">Avg Latency:</h5>
+                    <h3 className="text-black text-3xl p-2 self-center">
+                    100 ms
+                    <div className="text-xs">per request in ... </div>
+                    </h3>
+                </div>
+            </div>
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold">API Dashboard (ID: {id})</h2>
         <div className="space-x-2">
@@ -82,7 +146,7 @@ const Dashboard = () => {
       </div>
 
       {/* Line Chart */}
-      <div className="w-full h-120 bg-white shadow rounded-xl p-6">
+      <div className="w-100 h-120 bg-white shadow rounded-xl p-6">
         <h3 className="text-lg font-semibold mb-2">Requests Over Time</h3>
         <ResponsiveContainer width="100%" height={300}>
             <LineChart data={lineData}>

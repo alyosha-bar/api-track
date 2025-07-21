@@ -9,10 +9,15 @@ const ApiController = require('./apis.controller')
 
 // CRUD for API
 // Register API
+router.post("/register", ApiController.RegisterAPI)
+
+// GET ALL APIs
+router.get("/all", ApiController.GetAPIs)
 
 // Delete API
+// --> Delete API from NeonDB & Associated QuestDB entries
 
-// Update Token
+// Update / Reset Token
 
 // Update API Information
 

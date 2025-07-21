@@ -11,10 +11,10 @@ To Do List:
 - [x] Deploy on Railway for PRODUCTION version
 
 ### Clerk Stuff
-- [ ] Clerk Production Webhook
-- [ ] Backend Auth --> Clerk JWTs
-- [ ] Middleware to authorize and protect Users
+- [x] Clerk Production Webhook
+- [x] Backend Auth --> Clerk JWTs
+- [ ] Middleware to authorize and protect Users --> blueprint is there
 
-- [ ] API Registration Flow --> modals
+- [ ] API Registration Flow --> modals (scaffolded)
 - [ ] Dashboard design --> started
 - [ ] API Settings
