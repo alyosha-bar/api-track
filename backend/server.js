@@ -14,8 +14,6 @@ const apiRoutes = require('./modules/apis/apis.routes')
 const pool = require("./database/db")
 const questPool = require("./database/questdb")
 
-app.use(clerkMiddleware())
-app.use(express.json())
 
 app.use(cors({
   origin: [
@@ -28,6 +26,9 @@ app.use(cors({
   credentials: true,
   maxAge: 43200 
 }));
+
+app.use(clerkMiddleware())
+app.use(express.json())
 
 // grouped routes
 app.use('/api/auth', authRoutes)
