@@ -11,7 +11,7 @@ app.use(express.json())
 
 app.use(cors({
   origin: [
-    "https://diligent-perception-production.up.railway.app",
+    "https://aware-perfection-production.up.railway.app",
     "http://localhost:5173"
   ],
   methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
