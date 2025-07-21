@@ -1,7 +1,6 @@
 import { Route, Routes } from 'react-router-dom';
 import Landing from './pages/Landing';
 import Navbar from './components/Navbar';
-import { RedirectToSignIn, SignedIn, SignedOut } from '@clerk/clerk-react';
 import RequireAuth from './components/auth/RedirectToLanding';
 import Home from './pages/Home';
 import Dashboard from './pages/Dashboard';

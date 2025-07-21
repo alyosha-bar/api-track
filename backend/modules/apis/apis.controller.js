@@ -1,16 +1,19 @@
 // import API Service
+const ApiService = require('./apis.service')
 
 
-// controller functions
-const TestAPI = async (req, res, next) => {
-    console.log("Testing")
+const GetAnalytics = async (req, res) => {
+    const apiID = req.params.apiID
 
-    // call service
+    console.log(`Fetching analytics for ID: ${apiID}`)
 
-    res.status(200).json("Testing")
+    const result = await ApiService.GetAnalytics(apiID)
+    
+    res.status(200).json(result)
+
 }
 
 
 module.exports = {
-    TestAPI
+    GetAnalytics
 }

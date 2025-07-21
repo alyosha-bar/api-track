@@ -17,6 +17,7 @@ const ApiController = require('./apis.controller')
 // Update API Information
 
 // Fetch Analytics DATA --> QuestDB and NeonDB
+router.get("/analytics/:apiID", ApiController.GetAnalytics)
 
 
 module.exports = router;

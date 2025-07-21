@@ -9,7 +9,7 @@ const AuthController = require('./auth.controller')
 router.post("/signup", AuthController.SyncUser)
 
 // webhookd endpoint for clerk - delete account
-router.delete("/delete", )
+// router.delete("/delete", )
 
 module.exports = router;
 
