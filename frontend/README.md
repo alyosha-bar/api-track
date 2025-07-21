@@ -8,7 +8,10 @@ To Do List:
 - [x] Deploy Quest DB
 
 
-- [ ] Deploy on Railway for PRODUCTION version
+- [x] Deploy on Railway for PRODUCTION version
+
+### Clerk Stuff
+- [ ] Clerk Production Webhook
 - [ ] Backend Auth --> Clerk JWTs
 - [ ] Middleware to authorize and protect Users
 
