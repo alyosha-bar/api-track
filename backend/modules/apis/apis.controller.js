@@ -21,14 +21,17 @@ const RegisterAPI = async (req, res) => {
     console.log(req.user.id)
     
     // get the info from body
+    console.log(req.body)
 
     // generate token
     // insert into Neon
 
     // return token
-    res.status(200).json(req.user.id)
+    res.status(200).json({apiToken: "testtokentesttokentesttokentesttokentesttokentesttokentesttokentesttokentesttokentesttokentesttokentesttokentesttokentesttokentesttokentesttokentesttokentesttoken"})
 }
 
+
+// adjust to protect from OTHER LOGGED IN users
 const GetAnalytics = async (req, res) => {
     const apiID = req.params.apiID
 

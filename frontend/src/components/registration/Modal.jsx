@@ -1,20 +1,35 @@
 import React, { useState } from 'react';
+import { useRef } from 'react';
 import { useEffect } from 'react';
+import { Link } from 'react-router-dom';
 
 function Modal({ isOpen, onClose, onSubmitForm }) {
     const [formState, setFormState] = useState('form'); // 'form', 'loading', 'result'
-    const [formData, setFormData] = useState({ name: '', email: '' });
+    const [formData, setFormData] = useState({
+            title: '',
+            description: '',
+            project_name: '',
+            base_url: ''
+          });
     const [resultMessage, setResultMessage] = useState('');
+    const [copySuccess, setCopySuccess] = useState('');
+    const [apiToken, setApiToken] = useState(null)
+
+    const tokenRef = useRef(null);
 
     useEffect(() => {
-        // When the modal opens (isOpen becomes true), reset all internal states
         if (isOpen) {
-        setFormState('form');
-        setFormData({ name: '', email: '' });
-        setResultMessage('');
+          setFormState('form');
+          setFormData({
+            title: '',
+            description: '',
+            project_name: '',
+            base_url: ''
+          });
+          setApiToken('');
+          setResultMessage('');
+          setCopySuccess('');
         }
-        // We only want this effect to run when isOpen changes.
-        // If isOpen is false, we don't need to do anything.
     }, [isOpen]);
 
     const handleInputChange = (event) => {
@@ -27,18 +42,22 @@ function Modal({ isOpen, onClose, onSubmitForm }) {
 
     const handleFormSubmit = async (event) => {
     event.preventDefault();
-    setFormState('loading'); // Switch to loading state
+    setFormState('loading');
 
     try {
-        const response = await onSubmitForm(formData); // Call parent's submit handler
+        const response = await onSubmitForm(formData);
 
-        if (response) {
-            setResultMessage(response.message);
-            setFormState('result'); // Switch to result state
+        console.log(response)
+
+        if (response.error == true) {
+          setResultMessage(response.message)
+          setFormState('result')
         } else {
-            setResultMessage('An unexpected error occurred.');
-            setFormState('result');
+          setResultMessage(response.message)
+          setApiToken(response.apiToken)
+          setFormState('result')
         }
+
     } catch (error) {
             console.error('Error in modal submit handler:', error);
             setResultMessage('An error occurred while submitting.');
@@ -49,6 +68,22 @@ function Modal({ isOpen, onClose, onSubmitForm }) {
     if (!isOpen) {
         return null;
     }
+
+    // --- Copy to Clipboard Functionality ---
+    const copyToClipboard = () => {
+      if (tokenRef.current) {
+        navigator.clipboard.writeText(tokenRef.current.textContent)
+          .then(() => {
+            setCopySuccess('Copied!');
+            // Optionally, clear the "Copied!" message after a few seconds
+            setTimeout(() => setCopySuccess(''), 3000);
+          })
+          .catch(err => {
+            setCopySuccess('Failed to copy!');
+            console.error('Failed to copy token: ', err);
+          });
+      }
+    };
 
   return (
     // Modal Overlay
@@ -69,24 +104,47 @@ function Modal({ isOpen, onClose, onSubmitForm }) {
             <h2 className="text-2xl font-bold mb-5 text-center text-gray-800">Enter Your Details</h2>
             <form onSubmit={handleFormSubmit} className="space-y-4">
               <div>
-                <label htmlFor="name" className="block text-sm font-medium text-gray-700">Name</label>
+                <label htmlFor="title" className="block text-sm font-medium text-gray-700">Title</label>
                 <input
                   type="text"
-                  id="name"
-                  name="name"
-                  value={formData.name}
+                  id="title"
+                  name="title"
+                  value={formData.title}
                   onChange={handleInputChange}
                   required
                   className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                 />
               </div>
               <div>
-                <label htmlFor="email" className="block text-sm font-medium text-gray-700">Email</label>
+                <label htmlFor="description" className="block text-sm font-medium text-gray-700">Description</label>
+                <textarea
+                  id="description"
+                  name="description"
+                  value={formData.description}
+                  onChange={handleInputChange}
+                  required
+                  className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                />
+              </div>
+              <div>
+                <label htmlFor="project_name" className="block text-sm font-medium text-gray-700">Project Name</label>
                 <input
-                  type="email"
-                  id="email"
-                  name="email"
-                  value={formData.email}
+                  type="text"
+                  id="project_name"
+                  name="project_name"
+                  value={formData.project_name}
+                  onChange={handleInputChange}
+                  required
+                  className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                />
+              </div>
+              <div>
+                <label htmlFor="base_url" className="block text-sm font-medium text-gray-700">Base Url</label>
+                <input
+                  type="text"
+                  id="base_url"
+                  name="base_url"
+                  value={formData.base_url}
                   onChange={handleInputChange}
                   required
                   className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
@@ -113,13 +171,49 @@ function Modal({ isOpen, onClose, onSubmitForm }) {
 
         {formState === 'result' && (
           <div className="flex flex-col items-center justify-center py-8">
-            <h2 className="text-2xl font-bold mb-4 text-gray-800">Submission Result</h2>
-            <p className={`text-lg mb-6 ${resultMessage.includes('error') ? 'text-red-500' : 'text-green-600'}`}>
+            <h2 className={`text-2xl mb-4 text-center ${resultMessage.includes('error') ? 'text-red-500' : 'text-green-600'}`}>
               {resultMessage}
-            </p>
+            </h2>
+
+            {/* Styled API Token Display */}
+            {apiToken && (
+              <div className="mt-4 w-full max-w-sm text-center">
+                <h3 className="text-md font-semibold text-gray-700 mb-2">Your API Token:</h3>
+                <div className="flex items-center justify-between p-3 border border-gray-300 rounded-md bg-gray-50">
+                  <span
+                    ref={tokenRef}
+                    className="text-xs text-gray-700 font-mono truncate ... relative block"
+                    title={apiToken}
+                  >
+                    {apiToken}
+                  </span>
+                  <button
+                    onClick={copyToClipboard}
+                    className="ml-3 px-2 py-1 bg-blue-500 text-white text-xs font-medium rounded hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-50 transition duration-150 ease-in-out whitespace-nowrap"
+                  >
+                    {copySuccess || 'Copy'}
+                  </button>
+                </div>
+                {copySuccess && (
+                  <p className={`text-xs mt-1 ${copySuccess === 'Copied!' ? 'text-green-500' : 'text-red-500'}`}>
+                    {copySuccess}
+                  </p>
+                )}
+              </div>
+            )}
+
+            <div className="mt-6 p-4 border-t border-gray-200 w-full max-w-sm text-center text-gray-600 text-sm">
+              <p className="mb-2">
+                Plug the Token into the head of the index.html - Start!
+              </p>
+              <p>
+                Learn more about token at <Link to='/docs/tokens' className="text-blue-600 hover:underline">Docs</Link>
+              </p>
+            </div>
+
             <button
               onClick={onClose}
-              className="px-6 py-2 bg-gray-300 text-gray-800 font-semibold rounded-md hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-opacity-75 transition duration-150 ease-in-out"
+              className="mt-6 px-6 py-2 bg-gray-300 text-gray-800 font-semibold rounded-md hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-opacity-75 transition duration-150 ease-in-out"
             >
               Close
             </button>

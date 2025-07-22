@@ -31,48 +31,14 @@ const Home = () => {
         setApiData(data)
     }
 
+    // change to REACT QUERY
     useEffect(() => {
         fetchAllAPIs()
     }, [])
 
     // Future --> Filter by Project 
 
-    // Sample API data with the new 'project' field
-    // const apiData = [
-    //     {
-    //         id: 1,
-    //         title: "Weather API",
-    //         description: "Get real-time weather data for any location worldwide.",
-    //         statistic: "10M+ Requests/Day",
-    //         project: "Data Analytics Platform", // New field
-    //         link: "/weather"
-    //     },
-    //     {
-    //         id: 2,
-    //         title: "Currency Converter API",
-    //         description: "Convert currencies with up-to-date exchange rates.",
-    //         statistic: "5M+ Requests/Day",
-    //         project: "Financial Dashboard", // New field
-    //         link: "/currency"
-    //     },
-    //     {
-    //         id: 3,
-    //         title: "Movie Database API",
-    //         description: "Access a vast collection of movie information, cast, and ratings.",
-    //         statistic: "8M+ Requests/Day",
-    //         project: "Media Catalog", // New field
-    //         link: "/movies"
-    //     },
-    //     {
-    //         id: 4,
-    //         title: "News Feed API",
-    //         description: "Stay updated with the latest news from various sources.",
-    //         statistic: "12M+ Requests/Day",
-    //         project: "Content Aggregator", // New field
-    //         link: "/news"
-    //     }
-    // ];
-
+    // merge with other function
     const registerAPI = async () => {
 
         const token = await getToken({ template: 'IDToken' });
@@ -106,15 +72,37 @@ const Home = () => {
         // In a real app, you'd send formData to your backend API
         console.log('Form submitted with data:', formData);
 
+        const token = await getToken({ template: 'IDToken' });
+
         try {
             // Simulate an API call with a delay
-            await new Promise(resolve => setTimeout(resolve, 2000)); // Simulate 2 seconds delay
+            const response = await fetch(`${API_BASE}/api/core/register`, {
+                method: "POST",
+                headers: {
+                    "Authorization": `Bearer ${token}`,
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(formData)
+            })
+
+            if (!response.ok) {
+                return {
+                    error: true,
+                    message: "Failed to register API - try again :("
+                }
+            }
 
             // Simulate a successful response
+            const data = await response.json()
+
+            console.log(data.apiToken)
+
             const responseData = {
-                message: `Successfully processed: ${formData.name}!`,
-                status: 'success'
-            };
+                error: false,
+                message: "Successfully registered API",
+                apiToken: data.apiToken
+            }
+
             return responseData;
 
         } catch (error) {
