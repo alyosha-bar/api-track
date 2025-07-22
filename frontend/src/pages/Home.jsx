@@ -90,12 +90,12 @@ const Home = () => {
             // Simulate a successful response
             const data = await response.json()
 
-            console.log(data.apiToken)
+            setApiData(prevApis => [...prevApis, data.newApi])
 
             const responseData = {
                 error: false,
                 message: "Successfully registered API",
-                apiToken: data.apiToken
+                apiToken: data.newApi.api_token
             }
 
             return responseData;

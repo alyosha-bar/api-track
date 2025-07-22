@@ -42,7 +42,9 @@ const RegisterAPI = async (req, res) => {
 
         if (result.success) {
             // Return the token
-            res.status(200).json({ apiToken: result.data.api_token });
+            res.status(200).json({ 
+                newApi: result.data
+            });
         } else {
             res.status(500).json({ error: result.message });
         }
