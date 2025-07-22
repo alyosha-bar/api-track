@@ -1,4 +1,5 @@
 // import API Service
+const { generateToken } = require('../../util/token')
 const ApiService = require('./apis.service')
 
 const GetAPIs = async (req, res) => {
@@ -24,10 +25,30 @@ const RegisterAPI = async (req, res) => {
     console.log(req.body)
 
     // generate token
-    // insert into Neon
+    const token = generateToken()
 
-    // return token
-    res.status(200).json({apiToken: "testtokentesttokentesttokentesttokentesttokentesttokentesttokentesttokentesttokentesttokentesttokentesttokentesttokentesttokentesttokentesttokentesttokentesttoken"})
+    const apiData = {
+        title: req.body.title,
+        description: req.body.description,
+        project_name: req.body.project_name,
+        base_url: req.body.base_url,
+        apiToken: token,
+        user_id: req.user.id
+    }
+
+    try {
+        // Insert into Neon
+        const result = await ApiService.RegisterAPI(apiData);
+
+        if (result.success) {
+            // Return the token
+            res.status(200).json({ apiToken: result.data.api_token });
+        } else {
+            res.status(500).json({ error: result.message });
+        }
+    } catch (error) {
+        res.status(500).json({ error: 'Unexpected server error', details: error.message });
+    }
 }
 
 

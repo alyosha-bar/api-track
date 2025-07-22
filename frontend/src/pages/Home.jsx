@@ -60,18 +60,13 @@ const Home = () => {
 
     const handleRegisterApiClick = () => {
         setIsModalOpen(!isModalOpen)
-        // In a real app, this would navigate to a registration form or open a modal
     };
 
     const handleCloseModal = () => {
         setIsModalOpen(false);
-        // setModalContent(null); // Clear content on close if you were using it
     };
 
     const handleSubmitFormInModal = async (formData) => {
-        // In a real app, you'd send formData to your backend API
-        console.log('Form submitted with data:', formData);
-
         const token = await getToken({ template: 'IDToken' });
 
         try {

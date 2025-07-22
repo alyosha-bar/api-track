@@ -25,8 +25,44 @@ const GetAnalytics = async (apiID) => {
     }
 }
 
+const RegisterAPI = async (apiData) => {
+    try {
+        const query = `
+            INSERT INTO apis 
+            (title, description, project_name, base_url, user_id, api_token) 
+            VALUES ($1, $2, $3, $4, $5, $6) 
+            RETURNING *
+        `;
+
+        const values = [
+            apiData.title,
+            apiData.description,
+            apiData.project_name,
+            apiData.base_url,
+            apiData.user_id,
+            apiData.apiToken
+        ];
+
+        const result = await neonPool.query(query, values);
+
+        return {
+            success: true,
+            data: result.rows[0],
+            message: "API registered successfully."
+        };
+    } catch (error) {
+        console.error("Error in RegisterAPI:", error);
+        return {
+            success: false,
+            message: "Failed to register API.",
+            error: error.message
+        };
+    }
+};
+
 
 module.exports = {
     GetAnalytics,
-    GetAPIs
+    GetAPIs,
+    RegisterAPI
 }
