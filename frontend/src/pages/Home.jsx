@@ -6,10 +6,14 @@ import { API_BASE } from "../api/config";
 import { useAuth } from "@clerk/clerk-react";
 import { useEffect } from 'react';
 
+import { faGrip, faGripLines } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+
 const Home = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [apiData, setApiData] = useState([])
     const { getToken } = useAuth();
+    const [viewMode, setViewMode] = useState('grid');
 
     // fetch API data based on USERID --> use CLERK ID
     const fetchAllAPIs = async () => {
@@ -112,7 +116,44 @@ const Home = () => {
 
     return (
         <div className="container mx-auto p-8">
-            <h1 className="text-4xl font-bold text-center mb-12 text-gray-800"> Your Registered APIs</h1>
+            
+            <div className="w-full flex items-center justify-between mb-8 px-2 py-3 bg-white shadow-sm rounded-lg">
+                {/* Left side: Title */}
+                <h1 className="text-3xl font-bold text-gray-800 flex-grow">Your Registered APIs</h1> {/* Adjusted for flex-grow */}
+
+                {/* Right side: Toggle Buttons */}
+                <div className="flex items-center space-x-3">
+                {/* Grid Button */}
+                <button
+                    onClick={() => setViewMode('grid')}
+                    className={`px-4 py-2 rounded-lg flex items-center space-x-2 transition-colors duration-200
+                    ${viewMode === 'grid'
+                        ? 'bg-blue-600 text-white shadow-md'
+                        : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                    }`}
+                    aria-pressed={viewMode === 'grid'}
+                    aria-label="Switch to Grid View"
+                >
+                    <FontAwesomeIcon icon={faGrip}/>
+                </button>
+
+                {/* Rows Button */}
+                <button
+                    onClick={() => setViewMode('rows')}
+                    className={`px-4 py-2 rounded-lg flex items-center space-x-2 transition-colors duration-200
+                    ${viewMode === 'rows'
+                        ? 'bg-blue-600 text-white shadow-md'
+                        : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                    }`}
+                    aria-pressed={viewMode === 'rows'}
+                    aria-label="Switch to List View"
+                >
+                    <FontAwesomeIcon icon={faGripLines}/>
+                </button>
+                </div>
+            </div>
+
+            
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {apiData.map((api) => (
                     <Link to={`/dashboard/${api.id}`} key={api.id} className="block">
