@@ -8,6 +8,7 @@ import { useEffect } from "react";
 import { useMemo } from "react";
 import { API_BASE } from "../api/config";
 import { useAuth } from "@clerk/clerk-react";
+import Metrics from "../components/dashboard/Metrics";
 
 const COLORS = ["#6366f1", "#34d399", "#facc15", "#fb923c", "#f43f5e", "#0ea5e9"];
 
@@ -31,7 +32,7 @@ const Dashboard = () => {
     const fetchAnalytics = async () => {
       const token = await getToken({ template: 'IDToken' });
       try {
-        const response = await fetch(`${API_BASE}/api/core/analytics/${25}`, {
+        const response = await fetch(`${API_BASE}/api/core/analytics/${id}`, {
           headers: {
             "Authorization": `Bearer ${token}`,
             "Content-Type": "application/json"
@@ -49,84 +50,82 @@ const Dashboard = () => {
     
   }, [id]);
 
-  // Prepare chart data
-  const { lineData, methodData, statusData } = useMemo(() => {
-    if (!Array.isArray(rawData)) return { lineData: [], methodData: [], statusData: [] };
+  const { lineData, methodData, statusData, totalReq, errorRate, avgLatency } = useMemo(() => {
+  if (!Array.isArray(rawData)) {
+    return {
+      lineData: [],
+      methodData: [],
+      statusData: [],
+      totalReq: 0,
+      errorRate: 0,
+      avgLatency: 0
+    };
+  }
 
-    const formatter = timeScale === "monthly"
-      ? d => new Date(d).toISOString().slice(0, 7)   // YYYY-MM
-      : d => new Date(d).toISOString().slice(0, 10); // YYYY-MM-DD
+  const formatter = timeScale === "monthly"
+    ? d => new Date(d).toISOString().slice(0, 7)   // YYYY-MM
+    : d => new Date(d).toISOString().slice(0, 10); // YYYY-MM-DD
 
-    const byDate = groupBy(rawData, row => formatter(row.timestamp));
-    const lineData = Object.entries(byDate).map(([key, count]) => ({ timestamp: key, count }));
+  // 🧠 1. Line data over all time
+  const byDate = rawData.reduce((acc, row) => {
+    const key = formatter(row.timestamp);
+    acc[key] = acc[key] ? acc[key] + 1 : 1;
+    return acc;
+  }, {});
+  const lineData = Object.entries(byDate).map(([key, count]) => ({ timestamp: key, count }));
 
-    const byMethod = groupBy(rawData, row => row.method);
-    const methodData = Object.entries(byMethod).map(([method, count]) => ({ method, count }));
+  // 🧠 2. Get the latest time bucket (e.g. most recent day or month)
+  const latestBucket = (() => {
+    if (!rawData.length) return null;
+    const timestamps = rawData.map(row => formatter(row.timestamp));
+    return timestamps.sort().at(-1); // last in sorted list
+  })();
 
-    const byStatusRange = groupBy(rawData, row => {
-        const status = parseInt(row.status);
-            if (status >= 200 && status < 300) return '2xx';
-            if (status >= 300 && status < 400) return '3xx';
-            if (status >= 400 && status < 500) return '4xx';
-        return 'Other';
-    });
-    
-    const statusData = Object.entries(byStatusRange).map(([range, count]) => ({
-    status: range,
-    count
-    }));
+  // 🧠 3. Filter data to that bucket
+  const filtered = rawData.filter(row => formatter(row.timestamp) === latestBucket);
 
-    return { lineData, methodData, statusData };
-  }, [rawData, timeScale]);
+  // 🧠 4. Method breakdown in latest bucket
+  const byMethod = filtered.reduce((acc, row) => {
+    acc[row.method] = acc[row.method] ? acc[row.method] + 1 : 1;
+    return acc;
+  }, {});
+  const methodData = Object.entries(byMethod).map(([method, count]) => ({ method, count }));
+
+  // 🧠 5. Status breakdown in latest bucket
+  const byStatusRange = filtered.reduce((acc, row) => {
+    const status = parseInt(row.status);
+    let range = 'Other';
+    if (status >= 200 && status < 300) range = '2xx';
+    else if (status >= 300 && status < 400) range = '3xx';
+    else if (status >= 400 && status < 500) range = '4xx';
+    acc[range] = acc[range] ? acc[range] + 1 : 1;
+    return acc;
+  }, {});
+  const statusData = Object.entries(byStatusRange).map(([status, count]) => ({ status, count }));
+
+  // 🧠 6. Total requests
+  const totalReq = filtered.length;
+
+  // 🧠 7. Error rate (4xx or 5xx)
+  const errorCount = filtered.filter(r => {
+    const status = parseInt(r.status);
+    return status >= 400;
+  }).length;
+  const errorRate = totalReq > 0 ? Math.round((errorCount / totalReq) * 100) : 0;
+
+  // 🧠 8. Average latency
+  const sumLatency = filtered.reduce((acc, r) => acc + Number(r.response_time_ms), 0);
+  const avgLatency = totalReq > 0 ? Math.round(sumLatency / totalReq) : 0;
+
+  return { lineData, methodData, statusData, totalReq, errorRate, avgLatency };
+}, [rawData, timeScale]);
+
+
+  // link [daily, monthly] filter into the other data points
+  // calculate totalReq, errorRate, avgLatency
 
   return (
-    <div className="p-6 space-y-6">
-        {/* Metrics Summary Section */}
-            <div className="w-full border rounded-md border-gray-300 p-4 flex justify-around divide-x divide-gray-300 bg-white">
-                {/* Total Requests */}
-                <div className="flex-1 px-4 flex flex-col justify-center">
-                    {/* {totalreq && ( */}
-                    <>
-                        <h5 className="text-green-600 text-sm">Total Requests:</h5>
-                        <h3 className="text-green-600 text-3xl p-2 self-center">
-                        1000
-                        <div className="text-green-600 text-xs">requests in ... </div>
-                        </h3>
-                    </>
-                    {/* )} */}
-                </div>
-
-                {/* Error Rate */}
-                <div className="flex-1 px-4 flex flex-col justify-center">
-                    {/* {errorRate !== null && errorRate !== undefined && !isNaN(errorRate) && ( */}
-                    <>
-                        <h5 className="text-red-600 text-sm">Error Rate:</h5>
-                        <h3 className="text-red-600 text-3xl p-2 self-center">
-                        10%
-                        <div className="text-red-600 text-xs">in ... </div>
-                        </h3>
-                    </>
-                    {/* )} */}
-                </div>
-
-                {/* Avg Latency */}
-                <div className="flex-1 px-4 flex flex-col justify-center">
-                    <h5 className="text-black text-sm">Avg Latency:</h5>
-                    <h3 className="text-black text-3xl p-2 self-center">
-                    120 ms
-                    <div className="text-xs">per request in ... </div>
-                    </h3>
-                </div>
-                
-                {/* Avg Latency */}
-                <div className="flex-1 px-4 flex flex-col justify-center">
-                    <h5 className="text-black text-sm">Avg Latency:</h5>
-                    <h3 className="text-black text-3xl p-2 self-center">
-                    100 ms
-                    <div className="text-xs">per request in ... </div>
-                    </h3>
-                </div>
-            </div>
+    <div className="p-10 space-y-10">
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold">API Dashboard (ID: {id})</h2>
         <div className="space-x-2">
@@ -145,6 +144,12 @@ const Dashboard = () => {
         </div>
       </div>
 
+      <Metrics 
+        totalReq={totalReq}
+        errorRate={errorRate}
+        avgLatency={avgLatency}
+      />
+
       {/* Line Chart */}
       <div className="w-100 h-120 bg-white shadow rounded-xl p-6">
         <h3 className="text-lg font-semibold mb-2">Requests Over Time</h3>
@@ -161,10 +166,9 @@ const Dashboard = () => {
 
       {/* Method + Status Row */}
       <div className="flex flex-wrap gap-6">
-        {/* Bar Chart */}
         <div className="flex-1 min-w-[300px] h-80 bg-white shadow rounded-xl p-4">
           <h3 className="text-lg font-semibold mb-2">Method Breakdown</h3>
-          <ResponsiveContainer>
+          <ResponsiveContainer className="p-10">
             <BarChart data={methodData}>
               <XAxis dataKey="method" />
               <YAxis allowDecimals={false} />
@@ -177,7 +181,7 @@ const Dashboard = () => {
         {/* Pie Chart */}
         <div className="flex-1 min-w-[300px] h-80 bg-white shadow rounded-xl p-4">
           <h3 className="text-lg font-semibold mb-2">Status Codes</h3>
-          <ResponsiveContainer>
+          <ResponsiveContainer className="p-10">
             <PieChart>
               <Pie
                 data={statusData}
