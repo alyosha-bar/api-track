@@ -10,8 +10,9 @@ const Navbar = () => {
           <div class="flex items-center space-x-2">
             <img src="/logo.png" alt="API-Track Logo" className="h-8 w-8" />
             <h2 class="text-2xl font-bold text-gray-800">
-              <Link to="/">API-Track</Link>
+              <Link to="/" className="pr-10"> API-Track </Link>
             </h2>
+            <Link className="text-black hover:text-blue-500 font-medium" to="/docs"> Docs </Link>
           </div>
           {/* Navigation Links */}
           <div className='space-x-6 flex items-center'>

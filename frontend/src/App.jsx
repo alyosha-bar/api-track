@@ -4,6 +4,7 @@ import Navbar from './components/Navbar';
 import RequireAuth from './components/auth/RedirectToLanding';
 import Home from './pages/Home';
 import Dashboard from './pages/Dashboard';
+import Docs from './pages/Docs';
 
 export default function App() {
   return (
@@ -14,6 +15,8 @@ export default function App() {
 
       <Routes>
         <Route path="/" element={<Landing/>}></Route>
+
+        <Route path='/docs' element={<Docs/>}></Route>
 
         {/* protected  */}
         <Route path='/home' element={
