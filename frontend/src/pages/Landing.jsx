@@ -3,7 +3,6 @@ import Pricing from "../components/landing/Pricing";
 import Tech from "../components/landing/Tech";
 import Footer from "../components/landing/Footer";
 
-
 const Landing = () => {
 
     const navigate = useNavigate()
@@ -18,7 +17,9 @@ const Landing = () => {
                 </div>
                 <div className="call-to-action p-10 w-2/5 flex flex-col items-center justify-center">
                     <p className="text-black max-w-72"> API-Dev will track and analyse your 3rd party API usage and prevent you from overpaying your plan.</p>
-                    <button className="bg-blue-500 text-white p-4 m-6 rounded-lg w-2/5 min-w-36 hover:bg-blue-600 transition duration-300" onClick={() => {navigate('/signup')}}> Start Tracking </button>
+                    <button className="bg-blue-500 text-white p-4 m-6 rounded-lg w-2/5 min-w-36 hover:bg-blue-600 transition duration-300" onClick={() => {
+                        
+                    }}> Start Tracking </button>
                 </div>
                 
             </div>
@@ -31,7 +32,7 @@ const Landing = () => {
                 preserveAspectRatio="none"
                 >
                 <path
-                    fill="#ffffff" /* Background color for the next section */
+                    fill="#ffffff"
                     fillOpacity="1"
                     d="M0,96L48,122.7C96,149,192,203,288,192C384,181,480,107,576,80C672,53,768,75,864,90.7C960,107,1056,117,1152,106.7C1248,96,1344,64,1392,48L1440,32L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"
                 ></path>

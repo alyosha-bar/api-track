@@ -5,6 +5,7 @@ import RequireAuth from './components/auth/RedirectToLanding';
 import Home from './pages/Home';
 import Dashboard from './pages/Dashboard';
 import Docs from './pages/Docs';
+import Settings from './pages/Settings';
 
 export default function App() {
   return (
@@ -32,6 +33,15 @@ export default function App() {
           <>
             <RequireAuth>
               <Dashboard />
+            </RequireAuth>
+          </>
+        }></Route>
+
+        {/* protected  */}
+        <Route path='/settings/:id' element={
+          <>
+            <RequireAuth>
+              <Settings />
             </RequireAuth>
           </>
         }></Route>

@@ -32,6 +32,11 @@ const Docs = () => {
                 Getting Support
                 </a>
             </li>
+            <li>
+                <a href="#support" className="hover:text-blue-600 transition-colors">
+                Future Features
+                </a>
+            </li>
         </ul>
       </nav>
 

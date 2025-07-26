@@ -5,13 +5,12 @@ const Pricing = () => {
     return ( 
         <div className="bg-customGreen pricing-area flex p-10 items-center justify-center pb-16">
             <PricingCard 
-                title="Hobby Plan"
+                title="Hobby Plan (Beta)"
                 price="0"
                 features={[
-                  'Limited Projects',
-                  'Push Notifications',
+                  '10 Projects',
                   'Basic Analytics',
-                  '',
+                  'Personal Support',
                 ]}
                 buttonText="Start Free"
                 isPopular={true}
@@ -26,10 +25,9 @@ const Pricing = () => {
                 'Unlimited Projects',
                 'Push Notifications',
                 'Advanced Analytics',
-                'Automatic Ratelimiting',
               ]}
               buttonText="Register Interest"
-              isPopular={false} // This is the popular plan
+              isPopular={false}
               comingSoon={true}
             />
             
@@ -38,11 +36,9 @@ const Pricing = () => {
               title="Team Plan"
               price="?"
               features={[
-                'Unlimited Projects',
-                'Push Notifications',
-                'Advanced Analytics',
-                'Unlimited Team Members',
+                'All Dev+ Options',
                 'Collaboration Features',
+                'Unlimited Team Members',
               ]}
               buttonText="Register Interest"
               isPopular={false}

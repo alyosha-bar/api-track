@@ -2,13 +2,15 @@ import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   BarChart, Bar, PieChart, Pie, Cell, Legend
 } from "recharts";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { useState } from "react";
 import { useEffect } from "react";
 import { useMemo } from "react";
 import { API_BASE } from "../api/config";
 import { useAuth } from "@clerk/clerk-react";
 import Metrics from "../components/dashboard/Metrics";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCog } from "@fortawesome/free-solid-svg-icons";
 
 const COLORS = ["#6366f1", "#34d399", "#facc15", "#fb923c", "#f43f5e", "#0ea5e9"];
 
@@ -141,6 +143,9 @@ const Dashboard = () => {
           >
             Monthly
           </button>
+            <Link to={`/settings/${id}`} className="px-3 py-1 rounded bg-gray-200"> 
+              <FontAwesomeIcon icon={faCog}></FontAwesomeIcon>
+            </Link>
         </div>
       </div>
 
