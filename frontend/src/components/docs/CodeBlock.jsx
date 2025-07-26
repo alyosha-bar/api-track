@@ -13,7 +13,7 @@ const CodeBlock = ({ code }) => {
 
   return (
     <div className="relative bg-gray-900 text-white text-sm rounded-xl p-4 overflow-x-auto mb-6">
-      <pre className="whitespace-pre-wrap"><code>{code}</code></pre>
+      <pre className="whitespace-pre-wrap"><code className="text-green-600">{code}</code></pre>
       <button
         onClick={copy}
         className="absolute top-3 right-3 bg-gray-800 text-gray-300 hover:text-white p-1 rounded-md"

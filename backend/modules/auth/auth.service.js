@@ -3,7 +3,7 @@
 
 const pool = require("../../database/db")
 
-const InsertUser = async (clerkUser) => {
+const InsertUser = async (clerkUser, token) => {
     const user = clerkUser.data;
 
     const id = user.id;
@@ -12,12 +12,12 @@ const InsertUser = async (clerkUser) => {
     const lastName = user.last_name || null;
 
     const query = `
-        INSERT INTO users (id, email, first_name, last_name)
-        VALUES ($1, $2, $3, $4)
+        INSERT INTO users (id, email, first_name, last_name, user_token)
+        VALUES ($1, $2, $3, $4, $5)
         ON CONFLICT (id) DO NOTHING
     `;
 
-    await pool.query(query, [id, email, firstName, lastName]);
+    await pool.query(query, [id, email, firstName, lastName, token]);
 };
 
 module.exports = {

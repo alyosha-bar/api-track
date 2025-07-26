@@ -1,10 +1,10 @@
 
-To Do List:
+### To Do List:
 
 - [x] Design API tokens & Gateway system 
 - [x] Connect API-Gateway to Quest DB
-- [ ] Design Quest DB Schema &rarr sorta
-- [x] Connect Quest DB to API table in Neon &rarr connected by api_id right now
+- [x] Design Quest DB Schema --> sorta
+- [x] Connect Quest DB to API table in Neon --> connected by api_id right now
 - [x] Deploy Quest DB
 
 
@@ -13,12 +13,18 @@ To Do List:
 
 ### Clerk Stuff
 - [x] Clerk Production Webhook
-- [x] Backend Auth &rarr Clerk JWTs
-- [ ] Middleware to authorize and protect Users &rarr blueprint is there
+- [x] Backend Auth --> Clerk JWTs
+- [ ] Middleware to authorize and protect Users --> blueprint is there
 
 ### Frontend
 - [x] API Registration Flow
-- [ ] Dashboard design &rarr started
-- [ ] Dashboard &rarr more time scales (daily, monthly, weekly, all time)
+- [ ] Dashboard design --> started
+- [ ] Dashboard --> more time scales (daily, monthly, weekly, all time)
 - [ ] Supplementory statistic in Metrics component
 - [ ] API Settings
+
+### Architecture
+
+- [ ] Switch to Event-Driven Archicture
+- [ ] Configure a CDN for injecting the tracking script
+- [ ] Make something like "Push Notifications" using CRON Jobs and EDA

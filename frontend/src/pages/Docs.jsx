@@ -57,7 +57,7 @@ const Docs = () => {
             <div className="border-l-4 border-yellow-400 bg-yellow-50 p-4 rounded-md">
             <strong className="text-yellow-800 block mb-1">Note:</strong>
             <span className="text-yellow-700">
-                Replace <code>YOUR_USER</code> and <code>YOUR_TOKEN</code> with actual values from your settings dashboard.
+                Replace <code>YOUR_USER</code>, <code>YOUR_TOKEN</code> and <code>YOUR_API_URL</code> with actual values from your settings dashboard.
             </span>
             </div>
         </section>
