@@ -70,8 +70,26 @@ const GetAnalytics = async (req, res) => {
 
 }
 
+const UpdateAPI = async (req, res) => {
+    const apiID = req.params.apiID
+
+    const field = req.body.field
+    const value = req.body.value
+
+    console.log(`Editing: ${field} to ${value}`)
+
+    const result = await ApiService.UpdateInfo(field, value, apiID)
+
+    if (result.error != null) {
+        res.status(500).json("Error fetching analytics")
+    }
+    
+    res.status(200).json(result)
+}
+
 module.exports = {
     GetAPIs,
     GetAnalytics,
-    RegisterAPI
+    RegisterAPI,
+    UpdateAPI
 }

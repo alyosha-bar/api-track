@@ -60,9 +60,24 @@ const RegisterAPI = async (apiData) => {
     }
 };
 
+const UpdateInfo = async (field, value, apiID) => {
+
+    try {
+        query = 'UPDATE apis SET $1 = $2 WHERE api_id = $3;'
+
+        const result = await questPool.query(query, [field, value, apiID])
+        return result.rows
+    } catch (error) {
+        console.error('API error:', error)
+        return {error: error.message}
+    }
+
+    return 
+}
 
 module.exports = {
     GetAnalytics,
     GetAPIs,
-    RegisterAPI
+    RegisterAPI,
+    UpdateInfo
 }

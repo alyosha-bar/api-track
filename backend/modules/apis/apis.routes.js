@@ -17,9 +17,13 @@ router.get("/all", ApiController.GetAPIs)
 // Delete API
 // --> Delete API from NeonDB & Associated QuestDB entries
 
-// Update / Reset Token
+
+// Update / Reset API Token
+
+// Update / Reset User Token
 
 // Update API Information
+router.patch("/update/:apiID", ApiController.UpdateAPI)
 
 // Fetch Analytics DATA --> QuestDB and NeonDB
 router.get("/analytics/:apiID", ApiController.GetAnalytics)
