@@ -18,6 +18,7 @@ const questPool = require("./database/questdb")
 app.use(cors({
   origin: [
     "https://aware-perfection-production.up.railway.app",
+    "https://api-track.dev/",
     "http://localhost:5173"
   ],
   methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
