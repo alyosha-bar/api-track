@@ -2,6 +2,7 @@
 // Kafka producer goes here
 
 // import dependencies
+const { Kafka } = require('kafkajs');
 const express = require('express');
 const { Pool } = require('pg');
 const cors = require('cors');
@@ -24,7 +25,12 @@ pool.connect()
     .catch(err => console.error("Neon DB connection error:", err.stack));
 
 // configure Kafka producer
+const kafka = new Kafka({
+    clientId: 'api-gateway',
+    brokers: [process.env.KAFKA_BROKER || 'localhost:9092']
+});
 
+const producer = kafka.producer();
 
 // configure middleware
 app.use(cors());
@@ -44,7 +50,7 @@ app.post('/track', async (req, res) => {
     // validate apiToken and find apiID
     try {
         const apiTokenQuery = "SELECT id FROM apis WHERE api_token = $1";
-        const apiTokenResult = await neonPool.query(apiTokenQuery, [apiToken]);
+        const apiTokenResult = await pool.query(apiTokenQuery, [apiToken]);
 
         if (apiTokenResult.rows.length === 0) {
             console.log(`Invalid API token received: ${apiToken}`);
@@ -52,8 +58,20 @@ app.post('/track', async (req, res) => {
         }
         const api_id = apiTokenResult.rows[0].id;
         
+        console.log(`Tracking data received for API ID ${api_id}:`, { userId, apiUrl, method, status, responseTime, timestamp });
+
+        console.log("Publishing tracking data to Kafka...");
+
         // publish to Kafka queue along with apiID
-        
+        publishMessage('tracking-data', JSON.stringify({
+            userId, 
+            apiId: api_id, 
+            apiUrl, 
+            method, 
+            status, 
+            responseTime, 
+            timestamp
+        }));
 
 
 
@@ -65,6 +83,18 @@ app.post('/track', async (req, res) => {
 
 
 })
+
+// kafka function
+async function publishMessage(topic, message) {
+  await producer.connect();
+  await producer.send({
+    topic,
+    messages: [{ value: message }],
+  });
+  console.log(`✅ Message published to ${topic}: ${message}`);
+  await producer.disconnect();
+}
+
 
 // quick test endpoint
 app.get('/', (req, res) => {

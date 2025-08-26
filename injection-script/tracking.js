@@ -8,7 +8,7 @@
     const baseUrl = scriptTag.dataset.base || "";
 
     //possibly switch to env variable
-    const trackingServerUrl = scriptTag.dataset.endpoint || "https://tracker-api-gateway.onrender.com/track"; 
+    const trackingServerUrl = scriptTag.dataset.endpoint || "https://kafka-producer.up.railway.app/track"; 
 
     const originalFetch = global.fetch;
 
