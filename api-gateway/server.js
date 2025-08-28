@@ -111,6 +111,22 @@ app.get('/', (req, res) => {
 });
 
 
+// Generic error handler for any unhandled exceptions in routes
+app.use((err, req, res, next) => {
+    console.error('Unhandled Exception:', err.stack); // Log the full stack trace
+    // Check if the error was already handled (e.g., by express.json's verify)
+    if (res.headersSent) {
+        return next(err);
+    }
+    // If it's a custom error thrown by our verify or validation
+    if (err.message === 'Invalid JSON payload' || err.message.includes('Bad Request')) {
+        return res.status(400).json({ error: err.message });
+    }
+    // For all other unhandled errors, return a 500
+    res.status(500).json({ error: 'An unexpected internal server error occurred.' });
+});
+
+
 // run server
 app.listen(PORT, async () => {
     await producer.connect();
