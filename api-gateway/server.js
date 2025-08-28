@@ -92,11 +92,16 @@ app.post('/track', async (req, res) => {
 
 // kafka function
 async function publishMessage(topic, message) {
-  await producer.send({
-    topic,
-    messages: [{ value: message }],
-  });
-  console.log(`✅ Message published to ${topic}: ${message}`);
+
+    try {
+        await producer.send({
+            topic,
+            messages: [{ value: message }],
+        });
+        console.log(`✅ Message published to ${topic}: ${message}`);
+    } catch (err) {
+        console.error("❌ Failed to publish message:", err);
+    }
 }
 
 
