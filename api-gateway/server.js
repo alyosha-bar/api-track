@@ -20,6 +20,11 @@ const pool = new Pool({
     }
 })
 
+// log pool errors instead of crashing
+pool.on('error', (err) => {
+  console.error('Unexpected Neon DB error:', err);
+});
+
 pool.connect()
     .then(() => console.log("Connected to Neon DB"))
     .catch(err => console.error("Neon DB connection error:", err.stack));
@@ -27,7 +32,7 @@ pool.connect()
 // configure Kafka producer
 const kafka = new Kafka({
     clientId: 'api-gateway',
-    brokers: [process.env.KAFKA_BROKER || 'localhost:9092']
+    brokers: [`${process.env.KAFKA_BROKER}:9092` || 'localhost:9092']
 });
 
 const producer = kafka.producer();
@@ -80,19 +85,18 @@ app.post('/track', async (req, res) => {
         return res.status(500).send("Internal server error.");
     }
 
+    res.status(200).send("Tracking data received.");
 
 
 })
 
 // kafka function
 async function publishMessage(topic, message) {
-  await producer.connect();
   await producer.send({
     topic,
     messages: [{ value: message }],
   });
   console.log(`✅ Message published to ${topic}: ${message}`);
-  await producer.disconnect();
 }
 
 
@@ -103,6 +107,7 @@ app.get('/', (req, res) => {
 
 
 // run server
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
+    await producer.connect();
     console.log(`API server running at port: ${PORT}`)
 })
