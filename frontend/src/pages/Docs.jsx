@@ -77,7 +77,13 @@ const Docs = () => {
             Place the following script in your <code>&lt;head&gt;</code> or before your closing <code>&lt;/body&gt;</code> tag:
             </p>
 
-            <CodeBlock code={`<script async src="https://cdn.yourtracker.com/tracker.js?user=YOUR_USER&apitoken=YOUR_TOKEN&baseurl=YOUR_API_URL"></script>`} />
+            <CodeBlock code={`<script 
+    src="https://api-track.pages.dev/tracking.js"
+    data-user="<YOUR_USER>"
+    data-apitoken="<YOUR_TOKEN>"
+    data-base="<YOUR_API_URL>"
+    async>
+</script>`} />
 
             <div className="border-l-4 border-yellow-400 bg-yellow-50 p-4 rounded-md my-4">
                 <strong className="text-yellow-800 block mb-1">Note:</strong>
@@ -107,7 +113,7 @@ const Docs = () => {
                 For support or inquiries, feel free to reach out via email at <strong>apitrack.dev@gmail.com</strong>. 
             </p>
             <p className="mb-4 text-gray-600">
-                You’re also welcome to submit the <a className="text-blue-600" href="">feedback form</a> as many times as needed to report issues or suggest new features.
+                You’re also welcome to submit the <a className="text-blue-600" href="https://forms.gle/9e8GzvDSTBkkv9kGA">feedback form</a> as many times as needed to report issues or suggest new features.
             </p>
         </section>
 

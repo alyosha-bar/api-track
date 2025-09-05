@@ -39,7 +39,7 @@ const Footer = () => {
                         This is a beta product — your feedback helps us improve!
                     </p>
                     <a
-                        href="#"
+                        href="https://forms.gle/9e8GzvDSTBkkv9kGA"
                         className="inline-block text-sm text-white bg-blue-500 hover:bg-blue-600 transition px-4 py-2 rounded-lg shadow"
                     >
                         Feedback Form
