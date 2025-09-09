@@ -1,7 +1,7 @@
-// Kafka consumer goes here
+// RabbitMQ consumer goes here
 const express = require("express");
-const { Kafka } = require("kafkajs");
 const { Pool } = require('pg');
+const amqp = require('amqplib');
 require('dotenv').config();
 
 const app = express();
@@ -16,67 +16,66 @@ const pool = new Pool({
     database: 'qdb'
 })
 
-// Configure Kafka client
-const kafka = new Kafka({
-  clientId: "api-gateway",
-  brokers: [`${process.env.KAFKA_BROKER}:9092` || 'localhost:9092']
-});
+const rabbitmq_uri = process.env.RABBITMQ_URI || 'amqp://user:password@localhost:5672/';
+const queue = 'tracking_data';
 
-const consumer = kafka.consumer({ groupId: "test-group" });
-
-// Function to start consumer
+// Consume messages from RabbitMQ and insert into QuestDB
 async function startConsumer() {
-  await consumer.connect();
-  await consumer.subscribe({ topic: "tracking-data", fromBeginning: true });
+  try {
+    const connection = await amqp.connect(rabbitmq_uri);
+    const channel = await connection.createChannel();
+    await channel.assertQueue(queue, { durable: false });
 
-  await consumer.run({
-    eachMessage: async ({ topic, partition, message }) => {
-      const client = await pool.connect();
+    console.log(`✅ Waiting for messages in queue: "${queue}"`);
 
-      try {
-        // Parse Kafka message payload
-        const payload = JSON.parse(message.value.toString());
+    channel.consume(queue, async (msg) => {
+      if (msg !== null) {
+        try {
+          const messageContent = msg.content.toString();
+          const trackingData = JSON.parse(messageContent);
 
-        const insertQuery = `
-          INSERT INTO api_traffic_log (api_id, user_id, timestamp, method, status, response_time_ms)
-          VALUES ($1, $2, $3, $4, $5, $6)
-        `;
+          console.log("📥 Received:", trackingData);
 
-        // Use timestamp from payload (not Kafka internal timestamp)
-        const timestampObj = new Date(payload.timestamp);
+          // Insert into QuestDB (make sure you have a table with these columns!)
+          await pool.query(
+            `INSERT INTO api_traffic_log (api_id, user_id, timestamp, method, status, response_time_ms)
+            VALUES ($1, $2, $3, $4, $5, $6)`,
+            [
+              trackingData.api_id,
+              trackingData.userId,
+              trackingData.timestamp,
+              trackingData.method,
+              trackingData.status,
+              trackingData.responseTime,
+              
+            ]
+          );
 
-        const numericStatus = parseInt(payload.status, 10);
-        const numericResponseTime = parseInt(payload.responseTime, 10);
+          console.log("✅ Inserted into QuestDB");
 
-        await client.query(insertQuery, [
-          payload.apiId,
-          payload.userId,
-          timestampObj,
-          payload.method,
-          numericStatus,
-          numericResponseTime
-        ]);
-
-        console.log(`✅ Inserted tracking data for API ID ${payload.apiId}`);
-        console.log(`📩 Raw message: ${message.value.toString()}`);
-        console.log(payload);
-      } catch (err) {
-        console.error("❌ Error processing message:", err);
-      } finally {
-        client.release();
+          channel.ack(msg);
+        } catch (err) {
+          console.error("❌ Error processing message:", err);
+          channel.nack(msg, false, false); // reject and discard bad messages
+        }
       }
-    },
-  });
+    });
+  } catch (err) {
+    console.error("❌ Failed to start consumer:", err);
+    process.exit(1);
+  }
 }
 
-// Start consumer
-startConsumer().catch(console.error);
+
+// rabbit mq connection logic goes here
+// take in messages from rabbitmq and insert into questdb
 
 // Basic Express endpoint
 app.get("/", (req, res) => {
-  res.send("Kafka Consumer is running...");
+  res.send("Rabbit MQ Consumer is running...");
 });
 
-app.listen(port, () => {
+app.listen(port, async () => {
   console.log(`🚀 Express server running at http://localhost:${port}`);
+  await startConsumer();
 });
