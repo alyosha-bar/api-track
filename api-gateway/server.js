@@ -46,9 +46,9 @@ console.log('NEON_DATABASE_URL from environment:', process.env.NEON_DATABASE_URL
 // connect to Neon DB
 const pool = new Pool({
     connectionString: process.env.NEON_DATABASE_URL,
-    // ssl: { 
-    //     rejectUnauthorized: false 
-    // }
+    ssl: { 
+        rejectUnauthorized: false 
+    }
 })
 
 // log pool errors instead of crashing
