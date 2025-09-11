@@ -16,7 +16,7 @@ router.get("/all", ApiController.GetAPIs)
 
 // Delete API
 // --> Delete API from NeonDB & Associated QuestDB entries
-
+router.delete("/delete/:apiID", ApiController.DeleteAPI)
 
 // Update / Reset API Token
 

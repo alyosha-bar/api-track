@@ -15,7 +15,7 @@ const GetAPIs = async (userID) => {
 
 const GetAnalytics = async (apiID) => {
     try {
-        query = 'SELECT * FROM api_traffic_log WHERE api_id = $1;'
+        query = 'SELECT * FROM api_traffic_log WHERE api_id = $1 AND deleted = false;'
 
         const result = await questPool.query(query, [apiID])
         return result.rows
@@ -63,7 +63,7 @@ const RegisterAPI = async (apiData) => {
 const UpdateInfo = async (field, value, apiID) => {
 
     try {
-        query = 'UPDATE apis SET $1 = $2 WHERE api_id = $3;'
+        query = 'UPDATE apis SET $1 = $2 WHERE api_id = $3 ;'
 
         const result = await questPool.query(query, [field, value, apiID])
         return result.rows
@@ -75,9 +75,36 @@ const UpdateInfo = async (field, value, apiID) => {
     return 
 }
 
+const DeleteAPI = async (apiID) => {
+    try {
+        // Soft delete in QuestDB
+        const queryQuest = 'UPDATE api_traffic_log SET deleted = true WHERE api_id = $1;'
+        await questPool.query(queryQuest, [apiID])
+    } catch (error) {
+        console.error('Error deleting from QuestDB:', error)
+        return { error: error.message }
+    }
+
+    try {
+        // Still hard delete in Neon (based on your logic)
+        const queryNeon = 'DELETE FROM apis WHERE id = $1;'
+        await neonPool.query(queryNeon, [apiID])
+    } catch (error) {
+        console.error('Error deleting API in PostgreSQL:', error)
+        return { error: error.message }
+    }
+
+    // Always return a success object if no errors
+    return { success: true }
+}
+
+module.exports = { DeleteAPI }
+
+
 module.exports = {
     GetAnalytics,
     GetAPIs,
     RegisterAPI,
-    UpdateInfo
+    UpdateInfo,
+    DeleteAPI
 }

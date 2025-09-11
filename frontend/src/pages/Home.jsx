@@ -42,26 +42,6 @@ const Home = () => {
 
     // Future --> Filter by Project 
 
-    // merge with other function
-    const registerAPI = async () => {
-
-        const token = await getToken({ template: 'IDToken' });
-
-        console.log("Token:", token);
-
-        const response = await fetch(`${API_BASE}/api/core/register`, {
-            method: "POST",
-            headers: {
-                "Authorization": `Bearer ${token}`,
-                "Content-Type": "application/json"
-            },
-            credentials: "include"
-        })
-
-        const data = await response.json()
-        console.log(data)
-    }
-
     const handleRegisterApiClick = () => {
         setIsModalOpen(!isModalOpen)
     };

@@ -1,10 +1,13 @@
 import { useNavigate, useParams } from "react-router-dom";
 import { useRef, useState } from "react";
 import FieldModal from "../components/settings/FieldModal";
+import { API_BASE } from "../api/config";
+import { useAuth } from "@clerk/clerk-react";
 
 const Settings = () => {
     const { id } = useParams();
     const navigate = useNavigate();
+    const { getToken } = useAuth();
 
     // fetch API info by ID
 
@@ -24,6 +27,31 @@ const Settings = () => {
     const apiTokenRef = useRef(null);
 
     // Modal which has passed in field and submit function --> called FieldModal
+
+    const handleDelete = async () => {
+
+        // get token
+        const token = await getToken({ template: 'IDToken' });
+
+        // call delete API function
+        const response = await fetch(`${API_BASE}/api/core/delete/${id}`, {
+            method: 'DELETE',
+            headers: {
+                "Authorization": `Bearer ${token}`,
+                "Content-Type": "application/json"
+            }
+        });
+        if (!response.ok) {
+            console.error('Failed to delete API');
+            return;
+        }
+
+        const data = await response.json();
+        alert(data.message)
+        navigate("/home");
+    }
+
+
 
     return (
     <div className="max-w-4xl mx-auto px-6 py-10">
@@ -111,7 +139,10 @@ const Settings = () => {
 
         {/* Delete Button */}
         <div className="mt-16 text-right">
-            <button className="px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700">
+            <button 
+                className="px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700"
+                onClick={handleDelete}
+            >
             Delete Registered API
             </button>
         </div>

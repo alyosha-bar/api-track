@@ -87,9 +87,23 @@ const UpdateAPI = async (req, res) => {
     res.status(200).json(result)
 }
 
+const DeleteAPI = async (req, res) => {
+    const apiID = req.params.apiID
+    console.log(`Deleting API with ID: ${apiID}`)
+
+    const result = await ApiService.DeleteAPI(apiID)
+
+    if (result.error) {
+        return res.status(500).json({ error: result.error })
+    }
+
+    return res.status(200).json({ message: "API deleted successfully" })
+}
+
 module.exports = {
     GetAPIs,
     GetAnalytics,
     RegisterAPI,
-    UpdateAPI
+    UpdateAPI,
+    DeleteAPI
 }
