@@ -58,6 +58,8 @@ const RegisterAPI = async (req, res) => {
 const GetAnalytics = async (req, res) => {
     const apiID = req.params.apiID
 
+    // check whether the user owns this API
+
     console.log(`Fetching analytics for ID: ${apiID}`)
 
     const result = await ApiService.GetAnalytics(apiID)
