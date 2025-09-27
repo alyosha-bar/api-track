@@ -103,7 +103,8 @@ const Home = () => {
 
                 {/* Right side: Toggle Buttons */}
                 <div className="flex items-center space-x-3">
-                {/* Grid Button */}
+
+{/* 
                 <button
                     onClick={() => setViewMode('grid')}
                     className={`px-4 py-2 rounded-lg flex items-center space-x-2 transition-colors duration-200
@@ -117,7 +118,6 @@ const Home = () => {
                     <FontAwesomeIcon icon={faGrip}/>
                 </button>
 
-                {/* Rows Button */}
                 <button
                     onClick={() => setViewMode('rows')}
                     className={`px-4 py-2 rounded-lg flex items-center space-x-2 transition-colors duration-200
@@ -129,7 +129,7 @@ const Home = () => {
                     aria-label="Switch to List View"
                 >
                     <FontAwesomeIcon icon={faGripLines}/>
-                </button>
+                </button> */}
                 </div>
             </div>
 
