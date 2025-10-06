@@ -15,10 +15,10 @@ import { ChartPieDonut } from "@/components/charts/PieChart";
 // ToDo:
 // Adjust Chart discriptions and titles based on data
 // Fix data time frames (daily/weekly/monthly) | consisent over all charts
-// Scrolling between time frames
 
 // Loading states using react-query
 // Metrics: Total Requests, Error Rate, Avg Latency
+
 
 // Helpers
 // Format to "YYYY-MM-DD" (UTC)
@@ -165,21 +165,28 @@ const Dashboard = () => {
   // const weeklyGroups = groupByWeek(dailyData);
 
   const groups = timeScale === "monthly" ? monthlyGroups : weeklyGroups;
+  const sortedGroups = groups.sort((a, b) => new Date(b.month || b.week) - new Date(a.month || a.week));
 
   // Log current period whenever timeScale or index changes
   useEffect(() => {
-    if (groups.length === 0) return;
-    const period = groups[index];
+    if (sortedGroups.length === 0) return;
+
+    const period = sortedGroups[index];
+    console.log("Period:", period)
     console.log(`timeScale: ${timeScale}, Period: ${timeScale === "monthly" ? period.month : period.week}`);
     console.log("Entries:", period.entries);
   }, [timeScale, index, groups]);
 
-  const next = () => setIndex((i) => (i + 1) % groups.length);
-  const prev = () => setIndex((i) => (i - 1 + groups.length) % groups.length);
+  const next = () => {
+    setIndex(index - 1)
+  };
+  const prev = () => setIndex(index + 1);
 
   // Make sure we have a valid group
-  const selectedGroup = groups[index] || { entries: [] };
+  const selectedGroup = sortedGroups[index] || { entries: [] };
 
+  console.log("Selected Group:", selectedGroup);
+  
   // Extract daily entries to pass to the chart
   const selectedEntries = selectedGroup.entries;
 
@@ -188,7 +195,7 @@ const Dashboard = () => {
   const filledEntries = fillMissingDays(selectedEntries, periodStart, periodEnd);
 
   // based on prev and next filter data for also BarGraph and PieChart
-
+  console.log(filledEntries)
 
 
   // Calculate metrics
@@ -228,15 +235,18 @@ const Dashboard = () => {
 
             {/* Navigation buttons */}
             <div className="flex space-x-2">
+              <button onClick={() => console.log(index)}> Index </button>
               <button 
+                disabled={index === groups.length - 1}
                 onClick={prev} 
-                className="px-4 py-1 bg-gray-200 rounded hover:bg-gray-300 transition"
+                className="px-4 py-1 bg-gray-200 rounded hover:bg-gray-300 transition disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Prev
               </button>
               <button 
+                disabled={index === 0}
                 onClick={next} 
-                className="px-4 py-1 bg-gray-200 rounded hover:bg-gray-300 transition"
+                className="px-4 py-1 bg-gray-200 rounded hover:bg-gray-300 transition disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Next
               </button>
@@ -247,7 +257,7 @@ const Dashboard = () => {
               Current: {groups[index] ? (timeScale === "monthly" ? groups[index].month : groups[index].week) : "N/A"}
             </p>
 
-                      {/* Settings link */}
+          {/* Settings link */}
           <Link 
             to={`/settings/${id}`} 
             className="px-3 py-2 rounded bg-gray-200 hover:bg-gray-300 transition flex items-center justify-center"
