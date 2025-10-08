@@ -13,6 +13,24 @@ const GetAPIs = async (userID) => {
     }
 }
 
+const GetAPIInfo = async (apiID) => {
+    // DB query to get API info based on apiID
+    
+    console.log("Service - GetAPIInfo for ID:", apiID)
+
+    try {
+        query = 'SELECT apis.title, apis.description, apis.project_name, apis.base_url, apis.api_token, users.user_token FROM apis INNER JOIN users ON apis.user_id = users.id WHERE apis.id = $1;'
+
+        const result = await neonPool.query(query, [apiID])
+        return result.rows
+    } catch (error) {
+        console.error('API error:', error)
+        return {error: error.message}
+    }
+        
+}
+
+
 const GetAnalytics = async (apiID) => {
     try {
         query = 'SELECT * FROM api_traffic_log WHERE api_id = $1 AND deleted = false;'
@@ -104,6 +122,7 @@ module.exports = { DeleteAPI }
 module.exports = {
     GetAnalytics,
     GetAPIs,
+    GetAPIInfo,
     RegisterAPI,
     UpdateInfo,
     DeleteAPI

@@ -14,6 +14,9 @@ router.post("/register", ApiController.RegisterAPI)
 // GET ALL APIs
 router.get("/all", ApiController.GetAPIs)
 
+// GET API INFO
+router.get("/info/:apiID", ApiController.GetAPIInfo)
+
 // Delete API
 // --> Delete API from NeonDB & Associated QuestDB entries
 router.delete("/delete/:apiID", ApiController.DeleteAPI)
