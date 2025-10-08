@@ -6,14 +6,15 @@ import Home from './pages/Home';
 import Dashboard from './pages/Dashboard';
 import Docs from './pages/Docs';
 import Settings from './pages/Settings';
+import { Toaster } from './components/ui/sonner';
 
 export default function App() {
   return (
     <>
 
       <Navbar/>
-    
-
+      
+      <Toaster />
       <Routes>
         <Route path="/" element={<Landing/>}></Route>
 

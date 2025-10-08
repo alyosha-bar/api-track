@@ -17,6 +17,24 @@ const GetAPIs = async (req, res) => {
 }
 
 
+const GetAPIInfo = async (req, res) => {
+
+    // get API ID from params
+    const apiID = req.params.apiID
+    console.log(`Fetching info for API ID: ${apiID}`)
+    // Fetch title, description, project_name, base_url, API token & User Token
+    const result = await ApiService.GetAPIInfo(apiID)
+
+
+    // return 
+    if (result.error == null && result.length > 0) {
+        console.log("Controller - GetAPIInfo result:", result)
+        return res.status(200).json(result)
+    }
+
+    res.status(500).json(result.error || "Error fetching API info")
+}
+
 const RegisterAPI = async (req, res) => {
     // get the clerk_id of the user from middleware
     console.log(req.user.id)
@@ -104,6 +122,7 @@ const DeleteAPI = async (req, res) => {
 
 module.exports = {
     GetAPIs,
+    GetAPIInfo,
     GetAnalytics,
     RegisterAPI,
     UpdateAPI,

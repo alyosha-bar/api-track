@@ -9,6 +9,7 @@ import { faCog } from "@fortawesome/free-solid-svg-icons";
 import { SimpleLineChart } from "../components/charts/LineChart";
 import { ChartBarDefault } from "@/components/charts/BarGraph";
 import { ChartPieDonut } from "@/components/charts/PieChart";
+import MetricsCard from "../components/dashboard/Metrics";
 
 // const COLORS = ["#6366f1", "#34d399", "#facc15", "#fb923c", "#f43f5e", "#0ea5e9"];
 
@@ -40,53 +41,72 @@ function toUTCWeekString(date) {
   return `${d.getUTCFullYear()}-W${String(weekNo).padStart(2, "0")}`;
 }
 
-  function fillMissingDays(entries, periodStart, periodEnd) {
-    const start = new Date(periodStart);
-    const end = new Date(periodEnd);
-    const result = [];
-    const map = Object.fromEntries(entries.map(e => [e.date, e]));
+function fillMissingDays(entries, periodStart, periodEnd) {
+  const start = new Date(periodStart);
+  const end = new Date(periodEnd);
+  const result = [];
+  const map = Object.fromEntries(entries.map(e => [e.date, e]));
 
-    for (let d = new Date(start); d <= end; d.setUTCDate(d.getUTCDate() + 1)) {
-      const dateStr = d.toISOString().split("T")[0];
-      result.push(map[dateStr] || { date: dateStr, count: 0 });
-    }
-
-    return result;
+  for (let d = new Date(start); d <= end; d.setUTCDate(d.getUTCDate() + 1)) {
+    const dateStr = d.toISOString().split("T")[0];
+    result.push(map[dateStr] || { date: dateStr, count: 0 });
   }
 
-  function getPeriodRange(group, timeScale) {
-    if (!group) return [null, null];
+  return result;
+}
 
-    if (timeScale === "monthly") {
-      if (!group.month || typeof group.month !== "string") return [null, null];
-      const [year, month] = group.month.split("-").map(Number);
+function getPeriodRange(group, timeScale) {
+  if (!group) return [null, null];
 
-      if (!year || !month) return [null, null]; // invalid format
+  if (timeScale === "monthly") {
+    if (!group.month || typeof group.month !== "string") return [null, null];
+    const [year, month] = group.month.split("-").map(Number);
 
-      const start = new Date(Date.UTC(year, month - 1, 1));
-      const end = new Date(Date.UTC(year, month, 0)); // last day of month
-      return [start, end];
-    }
+    if (!year || !month) return [null, null]; // invalid format
 
-    if (timeScale === "weekly") {
-      if (!group.week || typeof group.week !== "string") return [null, null];
-      const [yearStr, weekStr] = group.week.split("-W");
-
-      if (!yearStr || !weekStr) return [null, null]; // invalid format
-
-      const year = Number(yearStr);
-      const week = Number(weekStr);
-
-      // ISO week to date
-      const simple = new Date(Date.UTC(year, 0, 1 + (week - 1) * 7));
-      const dayOfWeek = simple.getUTCDay();
-      const start = new Date(simple.getTime() - ((dayOfWeek + 6) % 7) * 86400000); // Monday
-      const end = new Date(start.getTime() + 6 * 86400000); // Sunday
-      return [start, end];
-    }
-
-    return [null, null];
+    const start = new Date(Date.UTC(year, month - 1, 1));
+    const end = new Date(Date.UTC(year, month, 0)); // last day of month
+    return [start, end];
   }
+
+  if (timeScale === "weekly") {
+    if (!group.week || typeof group.week !== "string") return [null, null];
+    const [yearStr, weekStr] = group.week.split("-W");
+
+    if (!yearStr || !weekStr) return [null, null]; // invalid format
+
+    const year = Number(yearStr);
+    const week = Number(weekStr);
+
+    // ISO week to date
+    const simple = new Date(Date.UTC(year, 0, 1 + (week - 1) * 7));
+    const dayOfWeek = simple.getUTCDay();
+    const start = new Date(simple.getTime() - ((dayOfWeek + 6) % 7) * 86400000); // Monday
+    const end = new Date(start.getTime() + 6 * 86400000); // Sunday
+    return [start, end];
+  }
+
+  return [null, null];
+}
+
+
+// month mapping
+const monthMapping = [
+  { value: "01", label: "January" },
+  { value: "02", label: "February" },
+  { value: "03", label: "March" },
+  { value: "04", label: "April" },
+  { value: "05", label: "May" },
+  { value: "06", label: "June" },
+  { value: "07", label: "July" },
+  { value: "08", label: "August" },
+  { value: "09", label: "September" },
+  { value: "10", label: "October" },
+  { value: "11", label: "November" },
+  { value: "12", label: "December" },
+]
+
+
 
 
 
@@ -208,7 +228,7 @@ const Dashboard = () => {
     <div className="p-10 space-y-10">
       <h2 className="text-2xl font-bold">API Dashboard (ID: {id})</h2>
       <div className="flex items-center justify-between">
-        <Metrics 
+        <MetricsCard 
           totalReq={totalRequests}
           errorRate={7.5}
           avgLatency={127}

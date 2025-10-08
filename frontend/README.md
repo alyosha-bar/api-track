@@ -26,5 +26,6 @@
 ### Architecture
 
 - [ ] Switch to Event-Driven Archicture
-- [ ] Configure a CDN for injecting the tracking script
+- [x] Configure a CDN for injecting the tracking script
 - [ ] Make something like "Push Notifications" using CRON Jobs and EDA
+- [ ] Redis Cache Layer
