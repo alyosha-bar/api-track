@@ -236,6 +236,12 @@ const Settings = () => {
 
     // Write API route for this
     const handleUpdate = () => {
+
+        // make API call to update project info
+
+
+
+
         setProject((prev) => ({ ...prev, ...edit }));
         setEdit({});
     };

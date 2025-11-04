@@ -3,13 +3,13 @@ import { useState } from "react";
 import { useEffect } from "react";
 import { API_BASE } from "../api/config";
 import { useAuth } from "@clerk/clerk-react";
-import Metrics from "../components/dashboard/Metrics";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCog } from "@fortawesome/free-solid-svg-icons";
 import { SimpleLineChart } from "../components/charts/LineChart";
 import { ChartBarDefault } from "@/components/charts/BarGraph";
 import { ChartPieDonut } from "@/components/charts/PieChart";
 import MetricsCard from "../components/dashboard/Metrics";
+import Endpoints from "@/components/dashboard/Endpoints";
 
 // const COLORS = ["#6366f1", "#34d399", "#facc15", "#fb923c", "#f43f5e", "#0ea5e9"];
 
@@ -18,8 +18,14 @@ import MetricsCard from "../components/dashboard/Metrics";
 // Fix data time frames (daily/weekly/monthly) | consisent over all charts
 
 // Loading states using react-query
-// Metrics: Total Requests, Error Rate, Avg Latency
+// Metrics:
+// Total Requests - DONE , Error Rate, Avg Latency
+// Pass in historic data for comparison (last month)
 
+// Bar Chart & Pie Chart:
+// sync to current month (prev/next)
+
+// Possibly rethink Pie Chart - maybe show top endpoints instead of methods
 
 // Helpers
 // Format to "YYYY-MM-DD" (UTC)
@@ -117,6 +123,7 @@ const Dashboard = () => {
   const [rawData, setRawData] = useState([]);
   const [timeScale, settimeScale] = useState("monthly"); // "weekly" | "monthly"
   const [index, setIndex] = useState(0);
+  const [avgLatency, setAvgLatency] = useState(0);
 
   const { getToken } = useAuth();
 
@@ -205,7 +212,9 @@ const Dashboard = () => {
   // Make sure we have a valid group
   const selectedGroup = sortedGroups[index] || { entries: [] };
 
-  console.log("Selected Group:", selectedGroup);
+  // console.log("Selected Group:", selectedGroup);
+
+  console.log("Raw Data Sample:", rawData.slice(0, 5));
   
   // Extract daily entries to pass to the chart
   const selectedEntries = selectedGroup.entries;
@@ -215,7 +224,7 @@ const Dashboard = () => {
   const filledEntries = fillMissingDays(selectedEntries, periodStart, periodEnd);
 
   // based on prev and next filter data for also BarGraph and PieChart
-  console.log(filledEntries)
+  // console.log(filledEntries)
 
 
   // Calculate metrics
@@ -223,6 +232,30 @@ const Dashboard = () => {
   const totalRequests = selectedEntries.reduce((sum, entry) => sum + entry.count, 0);
   // Error Rate in current month (comparison to last month)
   // Avg Latency in current month (comparison to last month) 
+  // sum of latencies in selectedEntries / length of selectedEntries
+  let sumLatency = 0;
+
+  useEffect(() => {
+
+    rawData.forEach(entry => {
+    // Check if entry date is in current period
+    const entryDate = toUTCDateString(entry.timestamp);
+    if (
+      periodStart &&
+      periodEnd &&
+      new Date(entryDate) >= periodStart &&
+      new Date(entryDate) <= periodEnd &&
+      typeof entry.response_time_ms === "number"
+    ) {
+      sumLatency += entry.response_time_ms;
+    }
+  });
+   setAvgLatency(selectedEntries.length > 0 ? Math.round(sumLatency / selectedEntries.length) : 0)
+
+
+  }, [rawData])
+
+
 
   return (
     <div className="p-10 space-y-10">
@@ -231,7 +264,7 @@ const Dashboard = () => {
         <MetricsCard 
           totalReq={totalRequests}
           errorRate={7.5}
-          avgLatency={127}
+          avgLatency={avgLatency}
           currentPeriod={groups[index] ? groups[index].month : "N/A"}
         />  
         {/* <button onClick={() => console.log(rawData)}> See Data </button> */}
@@ -274,7 +307,7 @@ const Dashboard = () => {
 
             {/* Current label */}
             <p className="text-gray-700 font-medium">
-              Current: {groups[index] ? (timeScale === "monthly" ? groups[index].month : groups[index].week) : "N/A"}
+              Current: {groups[index] ? (timeScale === "monthly" ? `${monthMapping.find(m => m.value === groups[index].month.split("-")[1])?.label} ${groups[index].month.split("-")[0]} ` : groups[index].week) : "N/A"}
             </p>
 
           {/* Settings link */}
@@ -297,6 +330,7 @@ const Dashboard = () => {
         <div className="flex gap-6">
           <ChartBarDefault rawData={rawData} />
           <ChartPieDonut rawData={rawData}/>
+          {/* <Endpoints/> */}
         </div>
       </div>
   );

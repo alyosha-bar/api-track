@@ -55,6 +55,12 @@ app.use(express.json());
 
 // /track endpoint
 app.post('/track', async (req, res) => {
+
+  // configure some security to ensure data integrity
+
+
+
+
   const { userId, apiToken, apiUrl, method, status, responseTime, timestamp } = req.body;
 
   // validate essential fields
