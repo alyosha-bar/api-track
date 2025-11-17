@@ -230,36 +230,48 @@ const Dashboard = () => {
   // Calculate metrics
   // Total Requests in current month (comparison to last month)
   const totalRequests = selectedEntries.reduce((sum, entry) => sum + entry.count, 0);
+
+  
   // Error Rate in current month (comparison to last month)
   // Avg Latency in current month (comparison to last month) 
   // sum of latencies in selectedEntries / length of selectedEntries
-  let sumLatency = 0;
 
+    
   useEffect(() => {
+    if (!rawData || rawData.length === 0) {
+      setAvgLatency(0);
+      return;
+    }
+
+    let sumLatency = 0;
+    let count = 0;
 
     rawData.forEach(entry => {
-    // Check if entry date is in current period
-    const entryDate = toUTCDateString(entry.timestamp);
-    if (
-      periodStart &&
-      periodEnd &&
-      new Date(entryDate) >= periodStart &&
-      new Date(entryDate) <= periodEnd &&
-      typeof entry.response_time_ms === "number"
-    ) {
-      sumLatency += entry.response_time_ms;
-    }
-  });
-   setAvgLatency(selectedEntries.length > 0 ? Math.round(sumLatency / selectedEntries.length) : 0)
+      const entryDate = new Date(entry.timestamp); // Directly use timestamp
+      if (
+        periodStart &&
+        periodEnd &&
+        entryDate >= periodStart &&
+        entryDate <= periodEnd &&
+        typeof entry.response_time_ms === "number"
+      ) {
+        sumLatency += entry.response_time_ms;
+        count++;
+      }
+    });
+
+    setAvgLatency(count > 0 ? Math.round(sumLatency / count) : 0);
+  }, [rawData, periodStart, periodEnd]);
 
 
-  }, [rawData])
 
 
 
   return (
     <div className="p-10 space-y-10">
       <h2 className="text-2xl font-bold">API Dashboard (ID: {id})</h2>
+      <button onClick={() => console.log(avgLatency)}> Latency </button>
+      <button onClick={() => console.log(selectedEntries)}> Selected Entries </button>
       <div className="flex items-center justify-between">
         <MetricsCard 
           totalReq={totalRequests}
