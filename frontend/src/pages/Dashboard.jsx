@@ -270,8 +270,8 @@ const Dashboard = () => {
   return (
     <div className="p-10 space-y-10">
       <h2 className="text-2xl font-bold">API Dashboard (ID: {id})</h2>
-      <button onClick={() => console.log(avgLatency)}> Latency </button>
-      <button onClick={() => console.log(selectedEntries)}> Selected Entries </button>
+      {/* <button onClick={() => console.log(avgLatency)}> Latency </button> */}
+      {/* <button onClick={() => console.log(selectedEntries)}> Selected Entries </button> */}
       <div className="flex items-center justify-between">
         <MetricsCard 
           totalReq={totalRequests}
